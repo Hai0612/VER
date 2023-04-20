@@ -1,0 +1,11 @@
+E1:Running Train
+E2:Train enter the restricted area
+E3:Bell ring
+E4:Accident occurrence
+E5:Traffic jam
+E6:Running a red light
+E7:Send message
+E8:Scan license plate
+E9:Vehicle passing through toll booth
+E10:Open door
+E11:Vehicle passing through gate

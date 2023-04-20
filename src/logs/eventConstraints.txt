@@ -1,0 +1,5 @@
+E3,during,E1
+E2,equal,E3
+E4,meet,E5
+E6,start,E7
+E8,before,E9
