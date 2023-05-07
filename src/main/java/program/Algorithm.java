@@ -35,94 +35,78 @@ public class Algorithm {
                 String eventB = algorithm.constraints.get(i).getEventB();
                 switch (constraint){
                     case "before":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventA());
                         if (!algorithm.checkBeforeConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "after":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventB());
                         if (!algorithm.checkAfterConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "equal":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventA());
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventB());
                         if (!algorithm.checkEqualConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "meet":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventA());
                         if (!algorithm.checkMeetConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "met-by":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventB());
                         if (!algorithm.checkMetByConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "start":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventA());
                         if (!algorithm.checkStartConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "started-by":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventB());
                         if (!algorithm.checkStartedByConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "finish":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventB());
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventA());
                         if (!algorithm.checkFinishConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "finished-by":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventB());
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventA());
                         if (!algorithm.checkFinishedByConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "during":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventA());
                         if (!algorithm.checkDuringConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "contain":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventB());
                         if (!algorithm.checkContainConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "overlap":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventA());
                         if (!algorithm.checkOverlapConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
                         break;
                     }
                     case "overlapped-by":{
-                        algorithm.timeStamps = algorithm.checkEventIsHappening(algorithm.timeStamps, algorithm.constraints.get(i).getEventA());
                         if (!algorithm.checkOverlappedByConstraint(algorithm.timeStamps, eventA, eventB)){
                             result = false;
                         }
@@ -180,20 +164,6 @@ public class Algorithm {
         frame.setVisible(true);
     }
 
-    /**
-     * Function to check if event is happening or not
-     * @param timeStamps
-     * @param eventName
-     * @return
-     */
-    private List<TimeStamp> checkEventIsHappening(List<TimeStamp> timeStamps, String eventName){
-        for (int i = 0; i < timeStamps.size(); i++){
-            if (timeStamps.get(i).getEvent().equals(eventName) && (timeStamps.get(i).getEndTime() == null || timeStamps.get(i).getStartTime() == null)){
-                timeStamps.remove(i);
-            }
-        }
-        return timeStamps;
-    }
     /**
      * Function that checks if the 'before' constraint between event A and B is satisfied or not
      * @param timeStamps
