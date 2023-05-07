@@ -15,6 +15,7 @@ public class Algorithm {
     static  String constraintPath  = "";
     static String resultInfo = "";
     static boolean result = true;
+    static boolean checkValidData = true;
     public static void main(String[] args) {
         logPath = "src/logs/convertedLog.txt";
         constraintPath = "src/logs/eventConstraints.txt";
@@ -23,6 +24,10 @@ public class Algorithm {
         algorithm.constraints = new ArrayList<>();
         algorithm.readEventConstraint(constraintPath);
         algorithm.readLogFile(logPath);
+        if (!checkValidData){
+            algorithm.showResult(resultInfo,true, true);
+            return;
+        }
         for (int i = 0; i < algorithm.constraints.size(); i++){
             if (!algorithm.constraints.get(i).getConstraint().isEmpty()){
                 String constraint = algorithm.constraints.get(i).getConstraint();
@@ -128,7 +133,7 @@ public class Algorithm {
 
             }
         }
-        algorithm.showResult(resultInfo,result);
+        algorithm.showResult(resultInfo,result, false);
     }
 
     /**
@@ -136,9 +141,9 @@ public class Algorithm {
      * @param resultInfo
      * @param result
      */
-    private void showResult(String resultInfo, Boolean result) {
+    private void showResult(String resultInfo, Boolean result, Boolean checkValidData) {
 
-        JFrame frame = new JFrame("System Result");
+        JFrame frame = new JFrame("VER: Verification of events at runtime");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(930,(resultInfo.split("--").length > 1 ? resultInfo.split("--").length * 52 + 200 : 2 * 160));
         JPanel panel = new JPanel(new FlowLayout());
@@ -157,6 +162,10 @@ public class Algorithm {
             resultField.setText("The system violates constraints");
             causeField.setText(resultInfo);
             resultField.setDisabledTextColor(Color.RED);
+        }
+        if (checkValidData){
+            resultField.setText("");
+            causeField.setText(resultInfo);
         }
         causeField.setEnabled(false);
         resultField.setEnabled(false);
@@ -357,7 +366,7 @@ public class Algorithm {
         }else{
             resultInfo +=  "\n-- Violate 'Meet' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
             if (timeStampE1.getEndTime() == -1){
-                resultInfo += "*End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that start time = " + timeStampE1.getStartTime() + "\n";
+                resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that start time = " + timeStampE1.getStartTime() + "\n";
             }else{
                 resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not equal to start time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getStartTime() + "\n";
             }
@@ -647,7 +656,7 @@ public class Algorithm {
             if(timeStampE1.getEndTime() <= timeStampE2.getEndTime()){
                 resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not greater than end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
             }
-            return true;
+            return false;
         }
         return true;
     }
@@ -755,7 +764,7 @@ public class Algorithm {
             if (timeStampE2.getEndTime() == -1){
                 resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that start time = " + timeStampE1.getStartTime() + "\n";
             }else{
-                resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not greater than end start time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
+                resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not greater than end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
             }
             return false;
         }
@@ -807,7 +816,7 @@ public class Algorithm {
             resultInfo +=  "\n-- Violate 'Met-by' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
 
             if (timeStampE2.getEndTime() == -1){
-                resultInfo += "*End time of event " +  timeStampE2.getShortEvent() + " is undefined at time that start time = " + timeStampE2.getStartTime() + "\n";
+                resultInfo += "Cause: End time of event " +  timeStampE2.getShortEvent() + " is undefined at time that start time = " + timeStampE2.getStartTime() + "\n";
             }else{
                 resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not greater than end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
             }
@@ -926,7 +935,7 @@ public class Algorithm {
     private boolean checkDuringRelation(TimeStamp timeStampE1, TimeStamp timeStampE2){
         if (timeStampE1.getEndTime() == -1 && timeStampE2.getEndTime() != -1){
             resultInfo +=  "\n-- Violate 'During' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
-            resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that" + timeStampE2.getShortEvent() + " has end time = " + timeStampE2.getEndTime() + "\n";
+            resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that " + timeStampE2.getShortEvent() + " has end time = " + timeStampE2.getEndTime() + "\n";
             return false;
         }
         if ((timeStampE1.getStartTime() <= timeStampE2.getStartTime()) || ((timeStampE1.getEndTime() >= timeStampE2.getEndTime()) && (timeStampE1.getEndTime() != -1))){
@@ -954,6 +963,11 @@ public class Algorithm {
                 String data = myReader.nextLine().trim();
                 if (!data.equals("") && data != null){
                     String[] result = data.split(",");
+                    if (Long.parseLong(result[1]) == -1 || (Long.parseLong(result[1]) > Long.parseLong(result[2]) && Long.parseLong(result[2]) > 0)){
+                        checkValidData = false;
+                        resultInfo +=  "\n Incorrect data format \n";
+                        return;
+                    }
                     this.timeStamps.add(new TimeStamp(result[0],Long.parseLong(result[1]),Long.parseLong(result[2])));
                 }
 

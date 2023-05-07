@@ -49,6 +49,7 @@ public class TimeStamp {
         return "event: " + this.event + ", start = " + this.startTime + ", end = " + this.endTime;
     }
     public String getShortInfo (){
-        return "event =  " + this.getShortEvent() + ", start = " + this.startTime + ", end = " + this.endTime;
+        String endTime = (this.endTime == - 1) ? "UNDEFINED" : Long.toString(this.endTime);
+        return "event =  " + this.getShortEvent() + ", start = " + this.startTime + ", end = " + endTime;
     }
 }
