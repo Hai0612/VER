@@ -143,7 +143,7 @@ public class Algorithm {
             resultField.setText("The system does not violate constraints");
             resultField.setDisabledTextColor(Color.GREEN);
         } else {
-            resultField.setText("The system violates constraints");
+            resultField.setText("Violation reports");
             causeField.setText(resultInfo);
             resultField.setDisabledTextColor(Color.RED);
         }
@@ -278,14 +278,21 @@ public class Algorithm {
             return true;
         }else{
             resultInfo +=  "\n-- Violate 'Equal' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
-
+            if(!timeStampE1.getStartTime().equals(timeStampE2.getStartTime())){
+                resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not equal to start time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getStartTime() + "\n";
+            }
+            if (timeStampE1.getEndTime() == -1){
+                resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that start time = " + timeStampE1.getStartTime() + "\n";
+                return false;
+            }
+            if (timeStampE2.getEndTime() == -1){
+                resultInfo += "Cause: End time of event " +  timeStampE2.getShortEvent() + " is undefined at time that start time = " + timeStampE2.getStartTime() + "\n";
+                return false;
+            }
             if (!timeStampE1.getEndTime().equals(timeStampE2.getEndTime())){
                 resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not equal to end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
             }
-            if(!timeStampE1.getStartTime().equals(timeStampE2.getStartTime())){
-                resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not equal to start time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getStartTime() + "\n";
 
-            }
             return false;
         }
     }
@@ -354,10 +361,10 @@ public class Algorithm {
     private boolean checkOverlapRelation(TimeStamp timeStampE1, TimeStamp timeStampE2){
         if (timeStampE1.getEndTime() == -1 && timeStampE2.getEndTime() != -1){
             resultInfo +=  "\n-- Violate 'Overlap' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
-            resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that" + timeStampE2.getShortEvent() + " has end time = " + timeStampE2.getEndTime() + "\n";
+            resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that " + timeStampE1.getShortEvent() + " has start time = " + timeStampE1.getStartTime() + "\n";
             return false;
         }
-        if ((timeStampE1.getStartTime() >= timeStampE2.getStartTime()) || (timeStampE1.getEndTime() <= timeStampE2.getStartTime()) || (timeStampE1.getEndTime() >= timeStampE2.getEndTime() && timeStampE1.getEndTime() != -1)) {
+        if ((timeStampE1.getStartTime() >= timeStampE2.getStartTime()) || (timeStampE1.getEndTime() <= timeStampE2.getStartTime()) || (timeStampE1.getEndTime() >= timeStampE2.getEndTime() && timeStampE1.getEndTime() != -1 && timeStampE2.getEndTime() != -1)) {
             resultInfo += "\n-- Violate 'Overlap' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent() + "\n";
             if (timeStampE1.getStartTime() >= timeStampE2.getStartTime()) {
                 resultInfo += "Cause: Start time of event " + timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not less than start time of event " + timeStampE2.getShortEvent() + " : " + timeStampE2.getStartTime() + "\n";
@@ -366,9 +373,9 @@ public class Algorithm {
                 resultInfo += "Cause: End time of event " + timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not greater than start time of event " + timeStampE2.getShortEvent() + " : " + timeStampE2.getStartTime() + "\n";
             }
             if (timeStampE1.getEndTime() >= timeStampE2.getEndTime() && timeStampE1.getEndTime() != -1) {
-                resultInfo += "Cause: End time of event " + timeStampE1.getShortEvent() + " is undefined at time that " + timeStampE2.getShortEvent()+" has end time = " + timeStampE1.getEndTime() + "\n";
+                resultInfo += "Cause: End time of event " + timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not less than end time of event " + timeStampE2.getShortEvent() + " : " + timeStampE2.getEndTime() + "\n";
             }
-            return true;
+            return false;
         }
         return  true;
     }
@@ -413,25 +420,25 @@ public class Algorithm {
      * @return
      */
     private boolean checkOverlappedByRelation(TimeStamp timeStampE1, TimeStamp timeStampE2) {
-        if (timeStampE1.getEndTime() != -1 && timeStampE2.getEndTime() == -1) {
-            resultInfo += "\n-- Violate 'Overlapped-by' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent() + "\n";
-            resultInfo += "Cause: End time of event " + timeStampE2.getShortEvent() + " is undefined at time that" + timeStampE1.getShortEvent() + " has end time = " + timeStampE1.getEndTime() + "\n";
+        if (timeStampE2.getEndTime() == -1 && timeStampE1.getEndTime() != -1){
+            resultInfo +=  "\n-- Violate 'Overlapped-by' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
+            resultInfo += "Cause: End time of event " +  timeStampE2.getShortEvent() + " is undefined at time that " + timeStampE2.getShortEvent() + " has start time = " + timeStampE2.getStartTime() + "\n";
             return false;
         }
-        if ((timeStampE1.getStartTime() <= timeStampE2.getStartTime()) || (timeStampE1.getEndTime() >= timeStampE2.getStartTime()) || (timeStampE1.getEndTime() <= timeStampE2.getEndTime() && timeStampE2.getEndTime() != -1)) {
-            resultInfo += "\n-- Violate 'Overlapped-by' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent() + "\n";
-            if (timeStampE1.getStartTime() <= timeStampE2.getStartTime()) {
-                resultInfo += "Cause: Start time of event " + timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not greater than start time of event " + timeStampE2.getShortEvent() + " : " + timeStampE2.getStartTime() + "\n";
+        if ((timeStampE2.getStartTime() >= timeStampE1.getStartTime()) || (timeStampE2.getEndTime() != -1 && timeStampE2.getEndTime() <= timeStampE1.getStartTime()) || (timeStampE2.getEndTime() >= timeStampE1.getEndTime() && timeStampE2.getEndTime() != -1 && timeStampE1.getEndTime() != -1)) {
+            resultInfo += "\n-- Violate 'Overlap' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent() + "\n";
+            if (timeStampE2.getStartTime() >= timeStampE1.getStartTime()) {
+                resultInfo += "Cause: Start time of event " + timeStampE2.getShortEvent() + " : " + timeStampE2.getStartTime() + "  is not less than start time of event " + timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "\n";
             }
-            if (timeStampE1.getEndTime() >= timeStampE2.getStartTime()) {
-                resultInfo += "Cause: End time of event " + timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not less than start time of event " + timeStampE2.getShortEvent() + " : " + timeStampE2.getStartTime() + "\n";
+            if (timeStampE2.getEndTime() <= timeStampE1.getStartTime()) {
+                resultInfo += "Cause: End time of event " + timeStampE2.getShortEvent() + " : " + timeStampE2.getEndTime() + "  is not greater than start time of event " + timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "\n";
             }
-            if (timeStampE1.getEndTime() <= timeStampE2.getEndTime() && timeStampE1.getEndTime() != -1) {
-                resultInfo += "Cause: End time of event " + timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not greater than end time of event " + timeStampE2.getShortEvent() + " : " + timeStampE2.getEndTime() + "\n";
+            if (timeStampE2.getEndTime() >= timeStampE1.getEndTime() && timeStampE2.getEndTime() != -1) {
+                resultInfo += "Cause: End time of event " + timeStampE2.getShortEvent() + " : " + timeStampE2.getEndTime() + "  is not less than end time of event " + timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "\n";
             }
-            return true;
+            return false;
         }
-        return true;
+        return  true;
     }
     /**
      * Function that checks if the 'overlapped-by' constraint between event A and B is satisfied or not
@@ -539,15 +546,19 @@ public class Algorithm {
      * @return
      */
     private boolean checkStartedByRelation(TimeStamp timeStampE1, TimeStamp timeStampE2){
-        if (timeStampE1.getStartTime().equals(timeStampE2.getStartTime()) && timeStampE1.getEndTime() > timeStampE2.getEndTime()){
+        if (timeStampE1.getStartTime().equals(timeStampE2.getStartTime())
+                &&  ((timeStampE2.getEndTime() != -1 && timeStampE1.getEndTime() == -1) || (timeStampE2.getEndTime() != -1 && timeStampE2.getEndTime() < timeStampE1.getEndTime()))){
             return true;
         }else{
             resultInfo +=  "\n-- Violate 'Started-by' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
             if (!timeStampE1.getStartTime().equals(timeStampE2.getStartTime())){
                 resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not equal to start time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getStartTime() + "\n";
             }
-            if(timeStampE1.getEndTime() <= timeStampE2.getEndTime()){
-                resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not greater than end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
+            if(timeStampE2.getEndTime() >= timeStampE1.getEndTime() && timeStampE2.getEndTime() != -1){
+                resultInfo += "Cause: End time of event " +  timeStampE2.getShortEvent() + " : " + timeStampE2.getEndTime() + "  is not less than end time of event " + timeStampE1.getShortEvent()+ " : " + timeStampE1.getEndTime() + "\n";
+            }
+            if(timeStampE2.getEndTime() == -1){
+                resultInfo += "Cause: End time of event " +  timeStampE2.getShortEvent() + " is undefined at time that start time = " + timeStampE2.getStartTime() + "\n";
             }
             return false;
         }
@@ -559,15 +570,23 @@ public class Algorithm {
      * @return
      */
     private boolean checkFinishedByRelation(TimeStamp timeStampE1, TimeStamp timeStampE2){
-        if (timeStampE1.getEndTime().equals(timeStampE2.getEndTime()) && timeStampE1.getStartTime() < timeStampE2.getStartTime()){
+        if (timeStampE1.getEndTime().equals(timeStampE2.getEndTime()) && timeStampE2.getStartTime() > timeStampE1.getStartTime() && (timeStampE1.getEndTime() != -1)){
             return true;
         }else{
             resultInfo +=  "\n-- Violate 'Finished-by' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
+            if(timeStampE2.getStartTime() <= timeStampE1.getStartTime()){
+                resultInfo += "Cause: Start time of event " +  timeStampE2.getShortEvent() + " : " + timeStampE2.getStartTime() + "  is not greater than start time of event " + timeStampE1.getShortEvent()+ " : " + timeStampE1.getStartTime() + "\n";
+            }
+            if(timeStampE2.getEndTime() == -1){
+                resultInfo += "Cause: End time of event " +  timeStampE2.getShortEvent() + " is undefined at time that " + timeStampE2.getShortEvent() + " has end time = " + timeStampE2.getStartTime() + "\n";
+                return false;
+            }
+            if(timeStampE1.getEndTime() == -1){
+                resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that " + timeStampE1.getShortEvent() + " has end time = " + timeStampE1.getStartTime() + "\n";
+                return false;
+            }
             if (!timeStampE1.getEndTime().equals(timeStampE2.getEndTime())){
                 resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not equal to end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
-            }
-            if(timeStampE1.getStartTime() >= timeStampE2.getStartTime()){
-                resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not less than start time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getStartTime() + "\n";
             }
             return false;
         }
@@ -613,18 +632,18 @@ public class Algorithm {
      * @return
      */
     private boolean checkContainRelation(TimeStamp timeStampE1, TimeStamp timeStampE2){
-        if (timeStampE1.getEndTime() != -1 && timeStampE2.getEndTime() == -1){
+        if (timeStampE2.getEndTime() == -1){
             resultInfo +=  "\n-- Violate 'During' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
-            resultInfo += "Cause: End time of event " +  timeStampE2.getShortEvent() + " is undefined at time that" + timeStampE1.getShortEvent() + " has end time = " + timeStampE1.getEndTime() + "\n";
+            resultInfo += "Cause: End time of event " +  timeStampE2.getShortEvent() + " is undefined at time that " + timeStampE2.getShortEvent() + " has start time = " + timeStampE2.getStartTime() + "\n";
             return false;
         }
-        if ((timeStampE1.getStartTime() >= timeStampE2.getStartTime()) || ((timeStampE1.getEndTime() <= timeStampE2.getEndTime()) && (timeStampE2.getEndTime() != -1))){
+        if ((timeStampE2.getStartTime() <= timeStampE1.getStartTime()) || ((timeStampE2.getEndTime() >= timeStampE1.getEndTime()) && (timeStampE2.getEndTime() != -1) && (timeStampE1.getEndTime() != -1))){
             resultInfo +=  "\n-- Violate 'During' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
-            if (timeStampE1.getStartTime() >= timeStampE2.getStartTime()){
-                resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not less then start time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getStartTime() + "\n";
+            if (timeStampE2.getStartTime() <= timeStampE1.getStartTime()){
+                resultInfo += "Cause: Start time of event " +  timeStampE2.getShortEvent() + " : " + timeStampE2.getStartTime() + "  is not greater than start time of event " + timeStampE1.getShortEvent()+ " : " + timeStampE1.getStartTime() + "\n";
             }
-            if(timeStampE1.getEndTime() <= timeStampE2.getEndTime()){
-                resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not greater than end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
+            if(timeStampE2.getEndTime() >= timeStampE1.getEndTime()){
+                resultInfo += "Cause: End time of event " +  timeStampE2.getShortEvent() + " : " + timeStampE2.getEndTime() + "  is not less than end time of event " + timeStampE1.getShortEvent()+ " : " + timeStampE1.getEndTime() + "\n";
             }
             return false;
         }
@@ -671,16 +690,19 @@ public class Algorithm {
      * @return
      */
     private boolean checkStartRelation(TimeStamp timeStampE1, TimeStamp timeStampE2){
-        if (timeStampE1.getStartTime().equals(timeStampE2.getStartTime()) && timeStampE1.getEndTime() < timeStampE2.getEndTime()){
+        if (timeStampE1.getStartTime().equals(timeStampE2.getStartTime())
+                &&  ((timeStampE1.getEndTime() != -1 && timeStampE2.getEndTime() == -1) || (timeStampE1.getEndTime() != -1 && timeStampE1.getEndTime() < timeStampE2.getEndTime()))){
             return true;
         }else{
             resultInfo +=  "\n-- Violate 'Start' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
             if (!timeStampE1.getStartTime().equals(timeStampE2.getStartTime())){
-
                 resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not equal to start time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getStartTime() + "\n";
             }
-            if(timeStampE1.getEndTime() >= timeStampE2.getEndTime()){
+            if(timeStampE1.getEndTime() >= timeStampE2.getEndTime() && timeStampE1.getEndTime() != -1){
                 resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not less than end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
+            }
+            if(timeStampE1.getEndTime() == -1){
+                resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that start time = " + timeStampE1.getStartTime() + "\n";
             }
             return false;
         }
@@ -732,7 +754,7 @@ public class Algorithm {
         }else{
             resultInfo +=  "\n-- Violate 'After' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
             if (timeStampE2.getEndTime() == -1){
-                resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that start time = " + timeStampE1.getStartTime() + "\n";
+                resultInfo += "Cause: End time of event " +  timeStampE2.getShortEvent() + " is undefined at time that start time = " + timeStampE2.getStartTime() + "\n";
             }else{
                 resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not greater than end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
             }
@@ -834,15 +856,23 @@ public class Algorithm {
      * @return
      */
     private boolean checkFinishRelation(TimeStamp timeStampE1, TimeStamp timeStampE2){
-        if (timeStampE1.getEndTime().equals(timeStampE2.getEndTime()) && timeStampE1.getStartTime() > timeStampE2.getStartTime()){
+        if (timeStampE1.getEndTime().equals(timeStampE2.getEndTime()) && timeStampE1.getStartTime() > timeStampE2.getStartTime() && (timeStampE2.getEndTime() != -1)){
             return true;
         }else{
             resultInfo +=  "\n-- Violate 'Finish' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
-            if (!timeStampE1.getEndTime().equals(timeStampE2.getEndTime())){
-                resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not equal to end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
-            }
             if(timeStampE1.getStartTime() <= timeStampE2.getStartTime()){
                 resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not greater than start time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getStartTime() + "\n";
+            }
+            if(timeStampE1.getEndTime() == -1){
+                resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that " + timeStampE1.getShortEvent() + " has end time = " + timeStampE1.getStartTime() + "\n";
+                return false;
+            }
+            if(timeStampE2.getEndTime() == -1){
+                resultInfo += "Cause: End time of event " +  timeStampE2.getShortEvent() + " is undefined at time that " + timeStampE2.getShortEvent() + " has end time = " + timeStampE2.getStartTime() + "\n";
+                return false;
+            }
+            if (!timeStampE1.getEndTime().equals(timeStampE2.getEndTime())){
+                resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not equal to end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
             }
             return false;
         }
@@ -905,10 +935,10 @@ public class Algorithm {
     private boolean checkDuringRelation(TimeStamp timeStampE1, TimeStamp timeStampE2){
         if (timeStampE1.getEndTime() == -1 && timeStampE2.getEndTime() != -1){
             resultInfo +=  "\n-- Violate 'During' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
-            resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that " + timeStampE2.getShortEvent() + " has end time = " + timeStampE2.getEndTime() + "\n";
+            resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " is undefined at time that " + timeStampE1.getShortEvent() + " has start time = " + timeStampE1.getStartTime() + "\n";
             return false;
         }
-        if ((timeStampE1.getStartTime() <= timeStampE2.getStartTime()) || ((timeStampE1.getEndTime() >= timeStampE2.getEndTime()) && (timeStampE1.getEndTime() != -1))){
+        if ((timeStampE1.getStartTime() <= timeStampE2.getStartTime()) || ((timeStampE1.getEndTime() >= timeStampE2.getEndTime()) && (timeStampE1.getEndTime() != -1) && (timeStampE2.getEndTime() != -1))){
             resultInfo +=  "\n-- Violate 'During' constraint between two events " + timeStampE1.getShortEvent() + " and " + timeStampE2.getShortEvent()+  "\n";
             if (timeStampE1.getStartTime() <= timeStampE2.getStartTime()){
                 resultInfo += "Cause: Start time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getStartTime() + "  is not greater than start time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getStartTime() + "\n";
@@ -916,7 +946,7 @@ public class Algorithm {
             if(timeStampE1.getEndTime() >= timeStampE2.getEndTime()){
                 resultInfo += "Cause: End time of event " +  timeStampE1.getShortEvent() + " : " + timeStampE1.getEndTime() + "  is not less than end time of event " + timeStampE2.getShortEvent()+ " : " + timeStampE2.getEndTime() + "\n";
             }
-            return true;
+            return false;
         }
         return true;
     }
@@ -933,12 +963,19 @@ public class Algorithm {
                 String data = myReader.nextLine().trim();
                 if (!data.equals("") && data != null){
                     String[] result = data.split(",");
-                    if (Long.parseLong(result[1]) == -1 || (Long.parseLong(result[1]) > Long.parseLong(result[2]) && Long.parseLong(result[2]) > 0)){
+                    try{
+                        if ((result.length != 3)  || (result[1].trim().isEmpty()) || (Long.parseLong(result[1].trim()) == -1) || (Long.parseLong(result[1].trim()) > Long.parseLong(result[2].trim()) && Long.parseLong(result[2].trim()) > 0)){
+                            checkValidData = false;
+                            resultInfo +=  "\n Incorrect data format \n";
+                            return;
+                        }
+                        this.timeStamps.add(new TimeStamp(result[0],Long.parseLong(result[1].trim()),Long.parseLong(result[2].trim())));
+                    }catch (NumberFormatException nfe) {
                         checkValidData = false;
                         resultInfo +=  "\n Incorrect data format \n";
                         return;
                     }
-                    this.timeStamps.add(new TimeStamp(result[0],Long.parseLong(result[1]),Long.parseLong(result[2])));
+
                 }
 
             }
